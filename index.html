@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>අදහස් හා පිළිතුරු</title>
 
-    <!-- Google Fonts - ලස්සන fonts සඳහා -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
-    <!-- Font Awesome - icons සඳහා -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDKs (Compat - CDN) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <style>
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -26,10 +25,11 @@
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding-top: 40px;
         }
 
         .container {
@@ -52,7 +52,6 @@
             font-size: 28px;
             font-weight: 700;
             color: #1a1a2e;
-            letter-spacing: -0.5px;
         }
 
         .header h1 i {
@@ -66,7 +65,287 @@
             margin-top: 5px;
         }
 
-        /* ===== Comment Form ===== */
+        /* ===== AUTH SECTION ===== */
+        .auth-section {
+            background: #f0f2fe;
+            padding: 20px 24px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid #d5d4f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .auth-section .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .auth-section .user-info .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6c63ff, #a29bfe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .auth-section .user-info .user-email {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .auth-section .auth-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-outline {
+            padding: 10px 24px;
+            border: 2px solid #6c63ff;
+            border-radius: 12px;
+            background: transparent;
+            color: #6c63ff;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline:hover {
+            background: #6c63ff;
+            color: white;
+        }
+
+        .btn-outline-danger {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .btn-outline-danger:hover {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-primary {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6c63ff, #5a52d5);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(108, 99, 255, 0.45);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-danger:hover {
+            background: #e55a5a;
+            transform: scale(0.95);
+        }
+
+        .btn-reply {
+            background: transparent;
+            color: #6c63ff;
+            font-size: 12px;
+            padding: 4px 14px;
+            border: 1px solid #6c63ff;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reply:hover {
+            background: #6c63ff;
+            color: white;
+        }
+
+        .btn-cancel-reply {
+            background: transparent;
+            color: #999;
+            font-size: 12px;
+            padding: 4px 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-cancel-reply:hover {
+            color: #ff6b6b;
+        }
+
+        .btn-submit-reply {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00b894, #00a381);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit-reply:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.35);
+        }
+
+        .btn-submit-reply:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== AUTH MODAL ===== */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-modal.active {
+            display: flex;
+        }
+
+        .auth-modal .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        .auth-modal .modal-content h2 {
+            text-align: center;
+            font-size: 24px;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .auth-modal .modal-content .subtitle {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .auth-modal .modal-content input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e8ebf5;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            outline: none;
+            margin-bottom: 14px;
+        }
+
+        .auth-modal .modal-content input:focus {
+            border-color: #6c63ff;
+            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.1);
+        }
+
+        .auth-modal .modal-content .auth-error {
+            color: #ff6b6b;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .auth-modal .modal-content .auth-error.show {
+            display: block;
+        }
+
+        .auth-modal .modal-content .modal-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .auth-modal .modal-content .modal-actions .btn-primary {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .auth-modal .modal-content .modal-actions .btn-outline {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .auth-modal .modal-content .toggle-mode {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .auth-modal .modal-content .toggle-mode span {
+            color: #6c63ff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .auth-modal .modal-content .toggle-mode span:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== COMMENT FORM ===== */
         .comment-form {
             background: #f8f9ff;
             padding: 24px;
@@ -114,86 +393,7 @@
             flex-wrap: wrap;
         }
 
-        .comment-form .form-actions .password-hint {
-            font-size: 12px;
-            color: #999;
-            margin-left: auto;
-        }
-
-        .btn {
-            padding: 12px 28px;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #6c63ff, #5a52d5);
-            color: white;
-            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.35);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(108, 99, 255, 0.45);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-danger {
-            background: #ff6b6b;
-            color: white;
-            font-size: 12px;
-            padding: 6px 14px;
-            border-radius: 8px;
-        }
-
-        .btn-danger:hover {
-            background: #e55a5a;
-            transform: scale(0.95);
-        }
-
-        .btn-reply {
-            background: transparent;
-            color: #6c63ff;
-            font-size: 12px;
-            padding: 4px 12px;
-            border: 1px solid #6c63ff;
-            border-radius: 20px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-reply:hover {
-            background: #6c63ff;
-            color: white;
-        }
-
-        .btn-cancel-reply {
-            background: transparent;
-            color: #999;
-            font-size: 12px;
-            padding: 4px 12px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .btn-cancel-reply:hover {
-            color: #ff6b6b;
-        }
-
-        /* ===== Comments Container ===== */
+        /* ===== COMMENTS ===== */
         .comments-container {
             margin-top: 10px;
         }
@@ -273,7 +473,7 @@
             color: #999;
         }
 
-        /* ===== Replies ===== */
+        /* ===== REPLIES ===== */
         .replies-container {
             margin-left: 55px;
             margin-top: 12px;
@@ -349,7 +549,7 @@
             background: #ffe0e0;
         }
 
-        /* ===== Reply Form (inline) ===== */
+        /* ===== REPLY FORM ===== */
         .reply-form {
             display: none;
             margin-top: 12px;
@@ -395,31 +595,7 @@
             align-items: center;
         }
 
-        .reply-form .btn-submit-reply {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #00b894, #00a381);
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .reply-form .btn-submit-reply:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.35);
-        }
-
-        .reply-form .btn-submit-reply:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* ===== Loading / Empty ===== */
+        /* ===== LOADING / EMPTY ===== */
         .loading {
             text-align: center;
             color: #999;
@@ -451,7 +627,7 @@
             font-size: 15px;
         }
 
-        /* ===== Animations ===== */
+        /* ===== ANIMATIONS ===== */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -474,7 +650,7 @@
             }
         }
 
-        /* ===== Responsive ===== */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -495,8 +671,12 @@
             .reply-form {
                 margin-left: 0;
             }
-            .comment-form .form-actions .password-hint {
-                display: none;
+            .auth-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            .auth-modal .modal-content {
+                padding: 24px;
             }
         }
     </style>
@@ -510,19 +690,32 @@
             <p>ඔබගේ අදහස් බෙදාගන්න, අන් අයට පිළිතුරු දෙන්න</p>
         </div>
 
+        <!-- AUTH SECTION -->
+        <div class="auth-section" id="authSection">
+            <div class="user-info" id="userInfo" style="display:none;">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span class="user-email" id="userEmail">user@email.com</span>
+            </div>
+            <div class="auth-buttons" id="authButtons">
+                <button class="btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> පිවිසෙන්න</button>
+                <button class="btn-outline" id="signupBtn"><i class="fas fa-user-plus"></i> ලියාපදිංචි වන්න</button>
+            </div>
+            <div class="auth-buttons" id="logoutButton" style="display:none;">
+                <button class="btn-outline btn-outline-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> පිටවන්න</button>
+            </div>
+        </div>
+
         <!-- COMMENT FORM -->
-        <div class="comment-form">
+        <div class="comment-form" id="commentFormSection" style="display:none;">
             <form id="commentForm">
                 <div class="form-row">
                     <input type="text" id="name" placeholder="👤 ඔබගේ නම" required />
-                    <input type="password" id="accessCode" placeholder="🔑 ප්‍රවේශ කේතය" required />
+                    <input type="text" id="comment" placeholder="💬 ඔබගේ අදහස ලියන්න..." required />
                 </div>
-                <textarea id="comment" placeholder="💬 ඔබගේ අදහස ලියන්න..." required></textarea>
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn-primary" id="submitBtn">
                         <i class="fas fa-paper-plane"></i> අදහස පළ කරන්න
                     </button>
-                    <span class="password-hint"><i class="fas fa-info-circle"></i> කේතය: "easter"</span>
                 </div>
             </form>
         </div>
@@ -533,74 +726,285 @@
         </div>
     </div>
 
+    <!-- ===== AUTH MODAL ===== -->
+    <div class="auth-modal" id="authModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">පිවිසෙන්න</h2>
+            <p class="subtitle" id="modalSubtitle">ඔබගේ ගිණුමට පිවිසෙන්න</p>
+            <div class="auth-error" id="authError">වලංගු නොවන ඊමේල් හෝ මුරපදයක්</div>
+            <input type="email" id="authEmail" placeholder="📧 ඊමේල් ලිපිනය" required />
+            <input type="password" id="authPassword" placeholder="🔒 මුරපදය" required />
+            <div class="modal-actions">
+                <button class="btn-primary" id="authSubmitBtn"><i class="fas fa-sign-in-alt"></i> පිවිසෙන්න</button>
+                <button class="btn-outline" id="authCancelBtn"><i class="fas fa-times"></i> අවලංගු කරන්න</button>
+            </div>
+            <div class="toggle-mode">
+                <span id="toggleAuthMode">ලියාපදිංචි වන්න</span>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================
-        // 🔥 FIREBASE CONFIGURATION - ඔබගේ Config එක මෙතන දාන්න
+        // 🔥 FIREBASE CONFIG - ඔබගේ Config එක
         // ============================================================
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyBUx6D6ekamqm-1XdK1q8n1D_UfvLrMU8s",
+            authDomain: "commentn-f7a7e.firebaseapp.com",
+            databaseURL: "https://commentn-f7a7e-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "commentn-f7a7e",
+            storageBucket: "commentn-f7a7e.firebasestorage.app",
+            messagingSenderId: "295619897354",
+            appId: "1:295619897354:web:bb6b7669b003f1447697f3",
+            measurementId: "G-0P6JX7PMS0"
         };
 
+        // Firebase Initialize කරන්න
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        console.log("🔥 Firebase initialized!");
+        console.log("📁 Database URL:", firebaseConfig.databaseURL);
 
         // ============================================================
-        // 🎯 හර ක්‍රියාකාරකම්
+        // 🎯 AUTH STATE MANAGEMENT
         // ============================================================
 
-        const commentsCollection = db.collection('comments');
+        let currentUser = null;
 
-        // පිළිතුරු දෙන comment එකේ ID එක මතක තියාගන්න
-        let replyingTo = null;
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                console.log("✅ User signed in:", user.email);
+                showLoggedInUI(user);
+                loadComments();
+            } else {
+                currentUser = null;
+                console.log("❌ User signed out");
+                showLoggedOutUI();
+                loadComments();
+            }
+        });
+
+        // ============================================================
+        // 🎯 UI UPDATE FUNCTIONS
+        // ============================================================
+
+        function showLoggedInUI(user) {
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('userEmail').textContent = user.email || 'No Email';
+            document.getElementById('userAvatar').textContent = (user.email ? user.email.charAt(0).toUpperCase() : 'U');
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('logoutButton').style.display = 'flex';
+            document.getElementById('commentFormSection').style.display = 'block';
+        }
+
+        function showLoggedOutUI() {
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('logoutButton').style.display = 'none';
+            document.getElementById('commentFormSection').style.display = 'none';
+        }
+
+        // ============================================================
+        // 🎯 AUTH MODAL
+        // ============================================================
+
+        let isLoginMode = true;
+
+        function openAuthModal(mode) {
+            isLoginMode = (mode === 'login');
+            const modal = document.getElementById('authModal');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const toggleText = document.getElementById('toggleAuthMode');
+            const errorDiv = document.getElementById('authError');
+
+            errorDiv.classList.remove('show');
+
+            if (isLoginMode) {
+                title.textContent = 'පිවිසෙන්න';
+                subtitle.textContent = 'ඔබගේ ගිණුමට පිවිසෙන්න';
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> පිවිසෙන්න';
+                toggleText.textContent = 'ලියාපදිංචි වන්න';
+            } else {
+                title.textContent = 'ලියාපදිංචි වන්න';
+                subtitle.textContent = 'නව ගිණුමක් සාදන්න';
+                submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> ලියාපදිංචි වන්න';
+                toggleText.textContent = 'පිවිසෙන්න';
+            }
+
+            document.getElementById('authEmail').value = '';
+            document.getElementById('authPassword').value = '';
+            modal.classList.add('active');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+            document.getElementById('authError').classList.remove('show');
+        }
+
+        document.getElementById('loginBtn').addEventListener('click', () => openAuthModal('login'));
+        document.getElementById('signupBtn').addEventListener('click', () => openAuthModal('signup'));
+        document.getElementById('authCancelBtn').addEventListener('click', closeAuthModal);
+
+        document.getElementById('toggleAuthMode').addEventListener('click', () => {
+            openAuthModal(isLoginMode ? 'signup' : 'login');
+        });
+
+        document.getElementById('authModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('authModal')) {
+                closeAuthModal();
+            }
+        });
+
+        // ============================================================
+        // 🎯 AUTH SUBMIT
+        // ============================================================
+
+        document.getElementById('authSubmitBtn').addEventListener('click', async () => {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+            const errorDiv = document.getElementById('authError');
+            const submitBtn = document.getElementById('authSubmitBtn');
+
+            if (!email || !password) {
+                errorDiv.textContent = '❌ කරුණාකර ඊමේල් සහ මුරපදය ඇතුළත් කරන්න.';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> සකසමින්...';
+            errorDiv.classList.remove('show');
+
+            try {
+                if (isLoginMode) {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } else {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                }
+                closeAuthModal();
+            } catch (error) {
+                console.error('Auth error:', error);
+                let message = '❌ දෝෂයක් ඇතිවිය.';
+                if (error.code === 'auth/user-not-found') {
+                    message = '❌ මෙම ඊමේල් එක සමඟ ගිණුමක් නොමැත.';
+                } else if (error.code === 'auth/wrong-password') {
+                    message = '❌ වැරදි මුරපදයකි.';
+                } else if (error.code === 'auth/email-already-in-use') {
+                    message = '❌ මෙම ඊමේල් එක දැනටමත් භාවිතයේ පවතී.';
+                } else if (error.code === 'auth/weak-password') {
+                    message = '❌ මුරපදය අවම වශයෙන් අකුරු 6කින් සමන්විත විය යුතුය.';
+                } else if (error.code === 'auth/invalid-email') {
+                    message = '❌ වලංගු නොවන ඊමේල් ලිපිනයකි.';
+                }
+                errorDiv.textContent = message;
+                errorDiv.classList.add('show');
+            } finally {
+                submitBtn.disabled = false;
+                if (isLoginMode) {
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> පිවිසෙන්න';
+                } else {
+                    submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> ලියාපදිංචි වන්න';
+                }
+            }
+        });
+
+        document.getElementById('authPassword').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('authSubmitBtn').click();
+            }
+        });
+
+        document.getElementById('authEmail').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('authPassword').focus();
+            }
+        });
+
+        // ============================================================
+        // 🎯 LOGOUT
+        // ============================================================
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            if (confirm('ඔබට පිටවීමට අවශ්‍යද?')) {
+                try {
+                    await auth.signOut();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            }
+        });
+
+        // ============================================================
+        // 🎯 COMMENT FUNCTIONS
+        // ============================================================
+
+        const commentsRef = db.ref('comments');
 
         // -------- කමෙන්ට් එකක් Save කරන එක --------
         document.getElementById('commentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const name = document.getElementById('name').value.trim();
-            const comment = document.getElementById('comment').value.trim();
-            const accessCode = document.getElementById('accessCode').value.trim();
-
-            if (!name || !comment || !accessCode) {
-                alert('කරුණාකර සියලුම ක්ෂේත්‍ර පුරවන්න.');
+            if (!currentUser) {
+                alert('❌ කරුණාකර පළමුව පිවිසෙන්න.');
                 return;
             }
 
+            const name = document.getElementById('name').value.trim();
+            const comment = document.getElementById('comment').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (!name || !comment) {
+                alert('❌ කරුණාකර නම සහ අදහස ඇතුළත් කරන්න.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> සුරකිමින්...';
+
             try {
-                await commentsCollection.add({
+                const newCommentRef = commentsRef.push();
+                await newCommentRef.set({
                     name: name,
                     comment: comment,
-                    accessCode: accessCode,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    replyTo: null // ප්‍රධාන කමෙන්ට් එකක්
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    replyTo: null,
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email
                 });
 
                 document.getElementById('commentForm').reset();
                 alert('✅ ඔබගේ අදහස සාර්ථකව එකතු විය!');
+
             } catch (error) {
-                console.error('Error adding comment:', error);
-                alert('❌ දෝෂයක් ඇතිවිය. නැවත උත්සාහ කරන්න.');
+                console.error('❌ Error:', error);
+                alert('❌ දෝෂයක් ඇතිවිය: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> අදහස පළ කරන්න';
             }
         });
 
         // -------- පිළිතුරක් Save කරන එක --------
         async function submitReply(commentId) {
+            if (!currentUser) {
+                alert('❌ කරුණාකර පළමුව පිවිසෙන්න.');
+                return;
+            }
+
             const nameInput = document.getElementById(`reply-name-${commentId}`);
             const commentInput = document.getElementById(`reply-comment-${commentId}`);
-            const accessInput = document.getElementById(`reply-access-${commentId}`);
             const btn = document.getElementById(`reply-submit-${commentId}`);
 
             const name = nameInput.value.trim();
             const comment = commentInput.value.trim();
-            const accessCode = accessInput.value.trim();
 
-            if (!name || !comment || !accessCode) {
-                alert('කරුණාකර සියලුම ක්ෂේත්‍ර පුරවන්න.');
+            if (!name || !comment) {
+                alert('❌ කරුණාකර නම සහ පිළිතුර ඇතුළත් කරන්න.');
                 return;
             }
 
@@ -608,222 +1012,216 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             try {
-                await commentsCollection.add({
+                const newReplyRef = commentsRef.push();
+                await newReplyRef.set({
                     name: name,
                     comment: comment,
-                    accessCode: accessCode,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    replyTo: commentId
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    replyTo: commentId,
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email
                 });
 
-                // පෝරමය reset කරන්න
                 nameInput.value = '';
                 commentInput.value = '';
-                accessInput.value = '';
-                // පිළිතුරු පෝරමය සඟවන්න
                 document.getElementById(`reply-form-${commentId}`).classList.remove('active');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-reply"></i> පිළිතුරු දෙන්න';
-
                 alert('✅ පිළිතුර සාර්ථකයි!');
+
             } catch (error) {
-                console.error('Error adding reply:', error);
-                alert('❌ දෝෂයක් ඇතිවිය.');
+                console.error('❌ Error:', error);
+                alert('❌ දෝෂයක් ඇතිවිය: ' + error.message);
+            } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-reply"></i> පිළිතුරු දෙන්න';
             }
         }
 
-        // -------- කමෙන්ට් එකක් Delete කරන එක (සහ එහි පිළිතුරු) --------
+        // -------- කමෙන්ට් එකක් Delete කරන එක --------
         async function deleteComment(commentId) {
+            if (!currentUser) {
+                alert('❌ කරුණාකර පළමුව පිවිසෙන්න.');
+                return;
+            }
+
             if (!confirm('මෙම අදහස සහ එහි පිළිතුරු සියල්ලම මකා දමනවාද?')) return;
 
             try {
-                // පිළිතුරු හොයාගෙන ඒවත් මකන්න
-                const replies = await commentsCollection.where('replyTo', '==', commentId).get();
-                const batch = db.batch();
+                const snapshot = await commentsRef.orderByChild('replyTo').equalTo(commentId).once('value');
+                const updates = {};
 
-                replies.forEach(doc => {
-                    batch.delete(doc.ref);
+                snapshot.forEach(child => {
+                    updates[child.key] = null;
                 });
 
-                // ප්‍රධාන කමෙන්ට් එක මකන්න
-                const commentRef = commentsCollection.doc(commentId);
-                batch.delete(commentRef);
+                updates[commentId] = null;
+                await commentsRef.update(updates);
 
-                await batch.commit();
                 alert('✅ අදහස සහ පිළිතුරු මකා දමන ලදී.');
             } catch (error) {
-                console.error('Error deleting:', error);
+                console.error('❌ Error deleting:', error);
                 alert('❌ මකා දැමීම අසාර්ථකයි.');
             }
         }
 
         // -------- පිළිතුරක් Delete කරන එක --------
         async function deleteReply(replyId) {
+            if (!currentUser) {
+                alert('❌ කරුණාකර පළමුව පිවිසෙන්න.');
+                return;
+            }
+
             if (!confirm('මෙම පිළිතුර මකා දමනවාද?')) return;
 
             try {
-                await commentsCollection.doc(replyId).delete();
+                await commentsRef.child(replyId).remove();
                 alert('✅ පිළිතුර මකා දමන ලදී.');
             } catch (error) {
-                console.error('Error deleting reply:', error);
+                console.error('❌ Error deleting reply:', error);
                 alert('❌ මකා දැමීම අසාර්ථකයි.');
             }
         }
 
-        // -------- පිළිතුරු පෝරමය පෙන්වන්න / සඟවන්න --------
+        // -------- පිළිතුරු පෝරමය පෙන්වන්න --------
         function toggleReplyForm(commentId) {
+            if (!currentUser) {
+                alert('❌ කරුණාකර පළමුව පිවිසෙන්න.');
+                return;
+            }
             const form = document.getElementById(`reply-form-${commentId}`);
             if (form) {
                 form.classList.toggle('active');
-                if (form.classList.contains('active')) {
-                    document.getElementById(`reply-comment-${commentId}`).focus();
-                }
             }
         }
 
-        // -------- කමෙන්ට් Load කරන එක (Realtime) --------
+        // -------- කමෙන්ට් Load කරන එක --------
         function loadComments() {
             const container = document.getElementById('commentsContainer');
 
-            commentsCollection
-                .orderBy('timestamp', 'desc')
-                .onSnapshot((snapshot) => {
-                    if (snapshot.empty) {
-                        container.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-comment-slash"></i>
-                                <p>තවම අදහස් නැත. පළමු අදහස එක් කරන්න!</p>
-                            </div>
-                        `;
-                        return;
-                    }
-
-                    // කමෙන්ට් එකතු කරගන්න - ප්‍රධාන කමෙන්ට් සහ පිළිතුරු වෙන වෙනම
-                    const mainComments = [];
-                    const replyMap = {};
-
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        const id = doc.id;
-                        const item = { id, ...data };
-
-                        if (data.replyTo) {
-                            // මෙය පිළිතුරක්
-                            if (!replyMap[data.replyTo]) replyMap[data.replyTo] = [];
-                            replyMap[data.replyTo].push(item);
-                        } else {
-                            // මෙය ප්‍රධාන කමෙන්ට් එකක්
-                            mainComments.push(item);
-                        }
-                    });
-
-                    // පිළිතුරු කාලය අනුව පෙළගස්වන්න (පැරණිම ඉහළින්)
-                    for (const key in replyMap) {
-                        replyMap[key].sort((a, b) => {
-                            const tA = a.timestamp ? a.timestamp.toDate() : new Date(0);
-                            const tB = b.timestamp ? b.timestamp.toDate() : new Date(0);
-                            return tA - tB;
-                        });
-                    }
-
-                    // HTML එක build කරන්න
-                    let html = '';
-
-                    mainComments.forEach(comment => {
-                        const timestamp = comment.timestamp ? comment.timestamp.toDate().toLocaleString('si-LK') :
-                            'මෑතකදී';
-                        const avatarLetter = comment.name.charAt(0).toUpperCase();
-                        const replies = replyMap[comment.id] || [];
-
-                        html += `
-                            <div class="comment-item" id="comment-${comment.id}">
-                                <div class="comment-header">
-                                    <div class="comment-author">
-                                        <div class="avatar">${avatarLetter}</div>
-                                        <span class="name">${escapeHtml(comment.name)}</span>
-                                        <span class="timestamp">${timestamp}</span>
-                                    </div>
-                                    <button class="btn-danger" onclick="deleteComment('${comment.id}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                                <div class="comment-text">${escapeHtml(comment.comment)}</div>
-                                <div class="comment-actions">
-                                    <button class="btn-reply" onclick="toggleReplyForm('${comment.id}')">
-                                        <i class="fas fa-reply"></i> පිළිතුරු දෙන්න
-                                    </button>
-                                    ${replies.length > 0 ? `<span class="reply-count"><i class="fas fa-comment"></i> ${replies.length} පිළිතුරු</span>` : ''}
-                                </div>
-
-                                <!-- පිළිතුරු පෝරමය -->
-                                <div class="reply-form" id="reply-form-${comment.id}">
-                                    <div class="reply-form-row">
-                                        <input type="text" id="reply-name-${comment.id}" placeholder="👤 ඔබගේ නම" required />
-                                        <input type="password" id="reply-access-${comment.id}" placeholder="🔑 ප්‍රවේශ කේතය" required />
-                                    </div>
-                                    <div class="reply-form-row" style="margin-top:10px;">
-                                        <input type="text" id="reply-comment-${comment.id}" placeholder="💬 පිළිතුර ලියන්න..." required style="flex:2;" />
-                                        <div class="reply-actions">
-                                            <button class="btn-submit-reply" id="reply-submit-${comment.id}" onclick="submitReply('${comment.id}')">
-                                                <i class="fas fa-paper-plane"></i> යවන්න
-                                            </button>
-                                            <button class="btn-cancel-reply" onclick="toggleReplyForm('${comment.id}')">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- පිළිතුරු පෙන්වන්න -->
-                                ${replies.length > 0 ? `
-                                <div class="replies-container">
-                                    ${replies.map(reply => {
-                                        const rTimestamp = reply.timestamp ? reply.timestamp.toDate().toLocaleString('si-LK') : 'මෑතකදී';
-                                        const rAvatar = reply.name.charAt(0).toUpperCase();
-                                        return `
-                                            <div class="reply-item" id="reply-${reply.id}">
-                                                <div class="reply-header">
-                                                    <div class="reply-author">
-                                                        <div class="reply-avatar">${rAvatar}</div>
-                                                        <span class="reply-name">${escapeHtml(reply.name)}</span>
-                                                        <span class="reply-timestamp">${rTimestamp}</span>
-                                                    </div>
-                                                    <button class="delete-reply-btn" onclick="deleteReply('${reply.id}')">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="reply-text">${escapeHtml(reply.comment)}</div>
-                                            </div>
-                                        `;
-                                    }).join('')}
-                                </div>
-                                ` : ''}
-                            </div>
-                        `;
-                    });
-
-                    container.innerHTML = html;
-                }, (error) => {
-                    console.error('Firestore error:', error);
+            commentsRef.orderByChild('timestamp').on('value', (snapshot) => {
+                if (!snapshot.exists()) {
                     container.innerHTML = `
-                        <div class="empty-state" style="color:#ff6b6b;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <p>දත්ත පූරණය කිරීමේ දෝෂයක්: ${error.message}</p>
+                        <div class="empty-state">
+                            <i class="fas fa-comment-slash"></i>
+                            <p>තවම අදහස් නැත. පළමු අදහස එක් කරන්න!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const allComments = [];
+                const replyMap = {};
+
+                snapshot.forEach(child => {
+                    const data = child.val();
+                    const id = child.key;
+                    const item = { id, ...data };
+
+                    if (data.replyTo) {
+                        if (!replyMap[data.replyTo]) replyMap[data.replyTo] = [];
+                        replyMap[data.replyTo].push(item);
+                    } else {
+                        allComments.push(item);
+                    }
+                });
+
+                for (const key in replyMap) {
+                    replyMap[key].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+                }
+
+                allComments.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                let html = '';
+
+                allComments.forEach(comment => {
+                    const timestamp = comment.timestamp ? new Date(comment.timestamp).toLocaleString(
+                    'si-LK') : 'මෑතකදී';
+                    const avatarLetter = comment.name.charAt(0).toUpperCase();
+                    const replies = replyMap[comment.id] || [];
+
+                    html += `
+                        <div class="comment-item" id="comment-${comment.id}">
+                            <div class="comment-header">
+                                <div class="comment-author">
+                                    <div class="avatar">${avatarLetter}</div>
+                                    <span class="name">${escapeHtml(comment.name)}</span>
+                                    <span class="timestamp">${timestamp}</span>
+                                </div>
+                                <button class="btn-danger" onclick="deleteComment('${comment.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="comment-text">${escapeHtml(comment.comment)}</div>
+                            <div class="comment-actions">
+                                <button class="btn-reply" onclick="toggleReplyForm('${comment.id}')">
+                                    <i class="fas fa-reply"></i> පිළිතුරු දෙන්න
+                                </button>
+                                ${replies.length > 0 ? `<span class="reply-count"><i class="fas fa-comment"></i> ${replies.length} පිළිතුරු</span>` : ''}
+                            </div>
+
+                            <div class="reply-form" id="reply-form-${comment.id}">
+                                <div class="reply-form-row">
+                                    <input type="text" id="reply-name-${comment.id}" placeholder="👤 ඔබගේ නම" required />
+                                </div>
+                                <div class="reply-form-row" style="margin-top:10px;">
+                                    <input type="text" id="reply-comment-${comment.id}" placeholder="💬 පිළිතුර ලියන්න..." required style="flex:2;" />
+                                    <div class="reply-actions">
+                                        <button class="btn-submit-reply" id="reply-submit-${comment.id}" onclick="submitReply('${comment.id}')">
+                                            <i class="fas fa-paper-plane"></i> යවන්න
+                                        </button>
+                                        <button class="btn-cancel-reply" onclick="toggleReplyForm('${comment.id}')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${replies.length > 0 ? `
+                            <div class="replies-container">
+                                ${replies.map(reply => {
+                                    const rTimestamp = reply.timestamp ? new Date(reply.timestamp).toLocaleString('si-LK') : 'මෑතකදී';
+                                    const rAvatar = reply.name.charAt(0).toUpperCase();
+                                    return `
+                                        <div class="reply-item" id="reply-${reply.id}">
+                                            <div class="reply-header">
+                                                <div class="reply-author">
+                                                    <div class="reply-avatar">${rAvatar}</div>
+                                                    <span class="reply-name">${escapeHtml(reply.name)}</span>
+                                                    <span class="reply-timestamp">${rTimestamp}</span>
+                                                </div>
+                                                <button class="delete-reply-btn" onclick="deleteReply('${reply.id}')">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                            <div class="reply-text">${escapeHtml(reply.comment)}</div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                            ` : ''}
                         </div>
                     `;
                 });
+
+                container.innerHTML = html;
+            }, (error) => {
+                console.error('❌ Database error:', error);
+                container.innerHTML = `
+                    <div class="empty-state" style="color:#ff6b6b;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>දත්ත පූරණය කිරීමේ දෝෂයක්: ${error.message}</p>
+                    </div>
+                `;
+            });
         }
 
-        // -------- XSS වලින් ආරක්ෂා වෙන්න escape function --------
+        // -------- XSS ආරක්ෂාව --------
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        // -------- පිටුව Load වෙනකොට කමෙන්ට් load කරන්න --------
+        // -------- පිටුව Load වෙනකොට --------
         loadComments();
     </script>
 
