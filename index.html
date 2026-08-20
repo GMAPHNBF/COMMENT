@@ -41,11 +41,13 @@
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
         }
 
         .header {
             text-align: center;
             margin-bottom: 30px;
+            position: relative;
         }
 
         .header h1 {
@@ -63,6 +65,33 @@
             color: #666;
             font-size: 14px;
             margin-top: 5px;
+        }
+
+        /* ===== HOME BUTTON ===== */
+        .btn-home-header {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: linear-gradient(135deg, #004a99, #00f2ff);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 74, 153, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            z-index: 10;
+        }
+
+        .btn-home-header:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 242, 255, 0.6);
+            background: linear-gradient(135deg, #00f2ff, #004a99);
         }
 
         /* ===== AUTH SECTION ===== */
@@ -678,6 +707,12 @@
             .auth-modal .modal-content {
                 padding: 24px;
             }
+            .btn-home-header {
+                position: static;
+                display: inline-flex;
+                margin-top: 10px;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -688,6 +723,11 @@
         <div class="header">
             <h1><i class="fas fa-comment-dots"></i> අදහස් හා පිළිතුරු</h1>
             <p>ඔබගේ අදහස් බෙදාගන්න, අන් අයට පිළිතුරු දෙන්න</p>
+            
+            <!-- 🏠 HOME BUTTON -->
+            <a href="https://gmaphnbf.github.io/HNBFGMAP/" target="_blank" class="btn-home-header">
+                <i class="fas fa-home"></i> Home
+            </a>
         </div>
 
         <!-- AUTH SECTION -->
@@ -899,331 +939,4 @@
                 } else if (error.code === 'auth/weak-password') {
                     message = '❌ මුරපදය අවම වශයෙන් අකුරු 6කින් සමන්විත විය යුතුය.';
                 } else if (error.code === 'auth/invalid-email') {
-                    message = '❌ වලංගු නොවන ඊමේල් ලිපිනයකි.';
-                }
-                errorDiv.textContent = message;
-                errorDiv.classList.add('show');
-            } finally {
-                submitBtn.disabled = false;
-                if (isLoginMode) {
-                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> පිවිසෙන්න';
-                } else {
-                    submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> ලියාපදිංචි වන්න';
-                }
-            }
-        });
-
-        document.getElementById('authPassword').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('authSubmitBtn').click();
-            }
-        });
-
-        document.getElementById('authEmail').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('authPassword').focus();
-            }
-        });
-
-        // ============================================================
-        // 🎯 LOGOUT
-        // ============================================================
-
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            if (confirm('ඔබට පිටවීමට අවශ්‍යද?')) {
-                try {
-                    await auth.signOut();
-                } catch (error) {
-                    console.error('Logout error:', error);
-                }
-            }
-        });
-
-        // ============================================================
-        // 🎯 COMMENT FUNCTIONS
-        // ============================================================
-
-        const commentsRef = db.ref('comments');
-
-        // -------- කමෙන්ට් එකක් Save කරන එක --------
-        document.getElementById('commentForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            if (!currentUser) {
-                alert('❌ කරුණාකර පළමුව පිවිසෙන්න.');
-                return;
-            }
-
-            const name = document.getElementById('name').value.trim();
-            const comment = document.getElementById('comment').value.trim();
-            const submitBtn = document.getElementById('submitBtn');
-
-            if (!name || !comment) {
-                alert('❌ කරුණාකර නම සහ අදහස ඇතුළත් කරන්න.');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> සුරකිමින්...';
-
-            try {
-                const newCommentRef = commentsRef.push();
-                await newCommentRef.set({
-                    name: name,
-                    comment: comment,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP,
-                    replyTo: null,
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email
-                });
-
-                document.getElementById('commentForm').reset();
-                alert('✅ ඔබගේ අදහස සාර්ථකව එකතු විය!');
-
-            } catch (error) {
-                console.error('❌ Error:', error);
-                alert('❌ දෝෂයක් ඇතිවිය: ' + error.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> අදහස පළ කරන්න';
-            }
-        });
-
-        // -------- පිළිතුරක් Save කරන එක --------
-        async function submitReply(commentId) {
-            if (!currentUser) {
-                alert('❌ කරුණාකර පළමුව පිවිසෙන්න.');
-                return;
-            }
-
-            const nameInput = document.getElementById(`reply-name-${commentId}`);
-            const commentInput = document.getElementById(`reply-comment-${commentId}`);
-            const btn = document.getElementById(`reply-submit-${commentId}`);
-
-            const name = nameInput.value.trim();
-            const comment = commentInput.value.trim();
-
-            if (!name || !comment) {
-                alert('❌ කරුණාකර නම සහ පිළිතුර ඇතුළත් කරන්න.');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-            try {
-                const newReplyRef = commentsRef.push();
-                await newReplyRef.set({
-                    name: name,
-                    comment: comment,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP,
-                    replyTo: commentId,
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email
-                });
-
-                nameInput.value = '';
-                commentInput.value = '';
-                document.getElementById(`reply-form-${commentId}`).classList.remove('active');
-                alert('✅ පිළිතුර සාර්ථකයි!');
-
-            } catch (error) {
-                console.error('❌ Error:', error);
-                alert('❌ දෝෂයක් ඇතිවිය: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-reply"></i> පිළිතුරු දෙන්න';
-            }
-        }
-
-        // -------- කමෙන්ට් එකක් Delete කරන එක --------
-        async function deleteComment(commentId) {
-            if (!currentUser) {
-                alert('❌ කරුණාකර පළමුව පිවිසෙන්න.');
-                return;
-            }
-
-            if (!confirm('මෙම අදහස සහ එහි පිළිතුරු සියල්ලම මකා දමනවාද?')) return;
-
-            try {
-                const snapshot = await commentsRef.orderByChild('replyTo').equalTo(commentId).once('value');
-                const updates = {};
-
-                snapshot.forEach(child => {
-                    updates[child.key] = null;
-                });
-
-                updates[commentId] = null;
-                await commentsRef.update(updates);
-
-                alert('✅ අදහස සහ පිළිතුරු මකා දමන ලදී.');
-            } catch (error) {
-                console.error('❌ Error deleting:', error);
-                alert('❌ මකා දැමීම අසාර්ථකයි.');
-            }
-        }
-
-        // -------- පිළිතුරක් Delete කරන එක --------
-        async function deleteReply(replyId) {
-            if (!currentUser) {
-                alert('❌ කරුණාකර පළමුව පිවිසෙන්න.');
-                return;
-            }
-
-            if (!confirm('මෙම පිළිතුර මකා දමනවාද?')) return;
-
-            try {
-                await commentsRef.child(replyId).remove();
-                alert('✅ පිළිතුර මකා දමන ලදී.');
-            } catch (error) {
-                console.error('❌ Error deleting reply:', error);
-                alert('❌ මකා දැමීම අසාර්ථකයි.');
-            }
-        }
-
-        // -------- පිළිතුරු පෝරමය පෙන්වන්න --------
-        function toggleReplyForm(commentId) {
-            if (!currentUser) {
-                alert('❌ කරුණාකර පළමුව පිවිසෙන්න.');
-                return;
-            }
-            const form = document.getElementById(`reply-form-${commentId}`);
-            if (form) {
-                form.classList.toggle('active');
-            }
-        }
-
-        // -------- කමෙන්ට් Load කරන එක --------
-        function loadComments() {
-            const container = document.getElementById('commentsContainer');
-
-            commentsRef.orderByChild('timestamp').on('value', (snapshot) => {
-                if (!snapshot.exists()) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-comment-slash"></i>
-                            <p>තවම අදහස් නැත. පළමු අදහස එක් කරන්න!</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const allComments = [];
-                const replyMap = {};
-
-                snapshot.forEach(child => {
-                    const data = child.val();
-                    const id = child.key;
-                    const item = { id, ...data };
-
-                    if (data.replyTo) {
-                        if (!replyMap[data.replyTo]) replyMap[data.replyTo] = [];
-                        replyMap[data.replyTo].push(item);
-                    } else {
-                        allComments.push(item);
-                    }
-                });
-
-                for (const key in replyMap) {
-                    replyMap[key].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-                }
-
-                allComments.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-                let html = '';
-
-                allComments.forEach(comment => {
-                    const timestamp = comment.timestamp ? new Date(comment.timestamp).toLocaleString(
-                    'si-LK') : 'මෑතකදී';
-                    const avatarLetter = comment.name.charAt(0).toUpperCase();
-                    const replies = replyMap[comment.id] || [];
-
-                    html += `
-                        <div class="comment-item" id="comment-${comment.id}">
-                            <div class="comment-header">
-                                <div class="comment-author">
-                                    <div class="avatar">${avatarLetter}</div>
-                                    <span class="name">${escapeHtml(comment.name)}</span>
-                                    <span class="timestamp">${timestamp}</span>
-                                </div>
-                                <button class="btn-danger" onclick="deleteComment('${comment.id}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                            <div class="comment-text">${escapeHtml(comment.comment)}</div>
-                            <div class="comment-actions">
-                                <button class="btn-reply" onclick="toggleReplyForm('${comment.id}')">
-                                    <i class="fas fa-reply"></i> පිළිතුරු දෙන්න
-                                </button>
-                                ${replies.length > 0 ? `<span class="reply-count"><i class="fas fa-comment"></i> ${replies.length} පිළිතුරු</span>` : ''}
-                            </div>
-
-                            <div class="reply-form" id="reply-form-${comment.id}">
-                                <div class="reply-form-row">
-                                    <input type="text" id="reply-name-${comment.id}" placeholder="👤 ඔබගේ නම" required />
-                                </div>
-                                <div class="reply-form-row" style="margin-top:10px;">
-                                    <input type="text" id="reply-comment-${comment.id}" placeholder="💬 පිළිතුර ලියන්න..." required style="flex:2;" />
-                                    <div class="reply-actions">
-                                        <button class="btn-submit-reply" id="reply-submit-${comment.id}" onclick="submitReply('${comment.id}')">
-                                            <i class="fas fa-paper-plane"></i> යවන්න
-                                        </button>
-                                        <button class="btn-cancel-reply" onclick="toggleReplyForm('${comment.id}')">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            ${replies.length > 0 ? `
-                            <div class="replies-container">
-                                ${replies.map(reply => {
-                                    const rTimestamp = reply.timestamp ? new Date(reply.timestamp).toLocaleString('si-LK') : 'මෑතකදී';
-                                    const rAvatar = reply.name.charAt(0).toUpperCase();
-                                    return `
-                                        <div class="reply-item" id="reply-${reply.id}">
-                                            <div class="reply-header">
-                                                <div class="reply-author">
-                                                    <div class="reply-avatar">${rAvatar}</div>
-                                                    <span class="reply-name">${escapeHtml(reply.name)}</span>
-                                                    <span class="reply-timestamp">${rTimestamp}</span>
-                                                </div>
-                                                <button class="delete-reply-btn" onclick="deleteReply('${reply.id}')">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                            <div class="reply-text">${escapeHtml(reply.comment)}</div>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                            ` : ''}
-                        </div>
-                    `;
-                });
-
-                container.innerHTML = html;
-            }, (error) => {
-                console.error('❌ Database error:', error);
-                container.innerHTML = `
-                    <div class="empty-state" style="color:#ff6b6b;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>දත්ත පූරණය කිරීමේ දෝෂයක්: ${error.message}</p>
-                    </div>
-                `;
-            });
-        }
-
-        // -------- XSS ආරක්ෂාව --------
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // -------- පිටුව Load වෙනකොට --------
-        loadComments();
-    </script>
-
-</body>
-</html>
+                    message = '❌ වලංග
